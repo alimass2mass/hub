@@ -1,0 +1,6 @@
+{
+  "name": "EngineerHub",
+  "description": "منصة اجتماعية احترافية مخصصة للمهندسين - شبكة تواصل هندسية",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

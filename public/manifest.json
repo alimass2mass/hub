@@ -1,0 +1,17 @@
+{
+  "short_name": "EngineerHub",
+  "name": "EngineerHub - مجتمع المهندسين العرب",
+  "description": "منصة التواصل وشبكة الأعمال المخصصة للمهندسين واللقاءات الهندسية والتقنية",
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/identicon/svg?seed=EngineerHub",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/#/",
+  "background_color": "#0a0e17",
+  "theme_color": "#0d9488",
+  "display": "standalone",
+  "orientation": "portrait"
+}

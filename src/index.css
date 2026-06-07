@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Cairo", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  /* Slate/Teal color theme suited for professional engineers */
+  --color-brand-primary: #0d9488;      /* Teal */
+  --color-brand-secondary: #14b8a6;    /* Light Teal */
+  --color-dark-bg: #0a0e17;            /* Deep Space Blue/Gray */
+  --color-dark-card: #151b26;          /* Deep Card Gray */
+  --color-dark-border: #232d3d;        /* Grid/Border */
+  --color-dark-muted: #64748b;         /* Muted Slate Text */
+  --color-dark-text: #f1f5f9;          /* Primary Slate white text */
+}
+
+/* Animations and scrolling styles */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0e17;
+}
+::-webkit-scrollbar-thumb {
+  background: #232d3d;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0d9488;
+}
+
+body {
+  background-color: var(--color-dark-bg);
+  color: var(--color-dark-text);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  direction: rtl; /* Set default Arabic RTL environment */
+}
+
+/* Custom fade indicator */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.6;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.7);
+  }
+}
+
+.story-active-ring {
+  background: linear-gradient(135deg, #0d9488, #14b8a6, #2dd4bf);
+  padding: 2px;
+}
+
+.story-viewed-ring {
+  background: #232d3d;
+  padding: 2px;
+}
+
+/* snapped scrolling for reels container */
+.snapped-y-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+}
+.snapped-y-item {
+  scroll-snap-align: start;
+}
