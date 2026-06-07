@@ -572,7 +572,7 @@ export class MockDB {
     return { user };
   }
 
-  static register(fullName: string, username: string, email: string, engineeringField: string): { user: User | null; error?: string } {
+  static register(fullName: string, username: string, email: string, engineeringField: string, password_hash?: string): { user: User | null; error?: string } {
     const users = getJSON<User[]>(KEYS.USERS, []);
     const usernameClean = username.trim().toLowerCase();
     const emailClean = email.trim().toLowerCase();
@@ -599,7 +599,7 @@ export class MockDB {
       followersCount: 0,
       followingCount: 0,
       postsCount: 0,
-      password_hash: '123456', // default password
+      password_hash: password_hash || '123456', // user chosen custom password or default
       twoFactorEnabled: false,
       hideActiveStatus: false,
       blockedUserIds: [],
@@ -1402,5 +1402,31 @@ export class MockDB {
       posts: filteredPosts,
       channels: filteredChannels
     };
+  }
+
+  // Remembered Accounts Helpers for easy logins on the device
+  static getRememberedAccounts(): { id: string; username: string; fullName: string; avatarUrl: string; email: string; engineeringField: string; password_hash: string }[] {
+    return getJSON<any[]>('eh_remembered_accounts', []);
+  }
+
+  static addRememberedAccount(user: any, password_hash: string) {
+    const accounts = this.getRememberedAccounts();
+    const filtered = accounts.filter(a => a.id !== user.id);
+    filtered.push({
+      id: user.id,
+      username: user.username,
+      fullName: user.fullName || user.username,
+      avatarUrl: user.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.username}`,
+      email: user.email,
+      engineeringField: user.engineeringField || 'مهندس عام',
+      password_hash: password_hash
+    });
+    setJSON('eh_remembered_accounts', filtered);
+  }
+
+  static removeRememberedAccount(userId: string) {
+    const accounts = this.getRememberedAccounts();
+    const filtered = accounts.filter(a => a.id !== userId);
+    setJSON('eh_remembered_accounts', filtered);
   }
 }

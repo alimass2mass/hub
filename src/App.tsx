@@ -70,7 +70,10 @@ export default function App() {
   const [registerFullName, setRegisterFullName] = useState('');
   const [registerUsername, setRegisterUsername] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
   const [registerField, setRegisterField] = useState('هندسة برمجيات');
+  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberedAccounts, setRememberedAccounts] = useState(() => MockDB.getRememberedAccounts());
   const [authError, setAuthError] = useState('');
 
   // Handle follow mappings on start
@@ -248,6 +251,10 @@ export default function App() {
         setShow2faChallenge(true);
       }
     } else if (res.user) {
+      if (rememberMe) {
+        MockDB.addRememberedAccount(res.user, loginPassword);
+        setRememberedAccounts(MockDB.getRememberedAccounts());
+      }
       setCurrentUser(res.user);
       handleRefreshFeed();
       setLoginPassword('');
@@ -280,8 +287,8 @@ export default function App() {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
-    if (!registerFullName.trim() || !registerUsername.trim() || !registerEmail.trim()) {
-      setAuthError('يرجى ملء جميع الحقول المطلوبة');
+    if (!registerFullName.trim() || !registerUsername.trim() || !registerEmail.trim() || !registerPassword.trim()) {
+      setAuthError('يرجى ملء جميع الحقول المطلوبة الكليّة وتعيين كلمة مرور آمنة');
       return;
     }
 
@@ -289,12 +296,21 @@ export default function App() {
       registerFullName.trim(),
       registerUsername.trim(),
       registerEmail.trim(),
-      registerField
+      registerField,
+      registerPassword.trim()
     );
 
     if (res.user) {
+      if (rememberMe) {
+        MockDB.addRememberedAccount(res.user, registerPassword.trim());
+        setRememberedAccounts(MockDB.getRememberedAccounts());
+      }
       setCurrentUser(res.user);
       handleRefreshFeed();
+      setRegisterFullName('');
+      setRegisterUsername('');
+      setRegisterEmail('');
+      setRegisterPassword('');
     } else {
       setAuthError(res.error || '');
     }
@@ -303,6 +319,22 @@ export default function App() {
   const handleLogout = () => {
     MockDB.logout();
     setCurrentUser(null);
+  };
+
+  const handleRemoveRememberedAccount = (uId: string) => {
+    MockDB.removeRememberedAccount(uId);
+    setRememberedAccounts(MockDB.getRememberedAccounts());
+  };
+
+  const handleLoginWithRememberedAccount = (account: any) => {
+    setAuthError('');
+    const res = MockDB.login(account.username, account.password_hash);
+    if (res.user) {
+      setCurrentUser(res.user);
+      handleRefreshFeed();
+    } else {
+      setAuthError(res.error || 'فشل تسجيل الدخول التلقائي. قد تكون قمت بتغيير كلمة المرور الخاصة بك.');
+    }
   };
 
   // Switch identity quick-switch to make testing multiple facets of EngineerHub extremely pleasant
@@ -332,7 +364,49 @@ export default function App() {
               <p className="text-xs text-dark-muted leading-relaxed mt-2.5">
                 أكبر منصة وشبكة تواصل اجتماعية مخصصة للمهندسين العرب في مختلف التخصصات. شارك مشاريعك الفنية والبرمجية ونقاشاتك الآن!
               </p>
+
+              {rememberedAccounts.length > 0 && (
+                <div className="mt-6 p-4 bg-dark-card/80 rounded-2xl border border-dark-border/80">
+                  <span className="text-[10px] font-black text-brand-primary block mb-2.5 select-none text-right">
+                    👤 الحسابات المحفوظة (تسجيل دخول سريع):
+                  </span>
+                  <div className="space-y-2 max-h-[170px] overflow-y-auto pr-0.5">
+                    {rememberedAccounts.map((acc) => (
+                      <div 
+                        key={acc.id}
+                        className="flex items-center justify-between bg-dark-bg/75 p-2 rounded-xl hover:border-brand-primary/40 border border-transparent transition-all group scale-100 hover:scale-[1.01]"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleLoginWithRememberedAccount(acc)}
+                          className="flex flex-1 items-center gap-2.5 text-right cursor-pointer"
+                        >
+                          <img 
+                            src={acc.avatarUrl} 
+                            alt={acc.fullName} 
+                            referrerPolicy="no-referrer"
+                            className="w-8 h-8 rounded-lg object-cover bg-dark-card border border-dark-border group-hover:border-brand-primary"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-[11px] font-bold text-white truncate leading-tight">{acc.fullName}</h4>
+                            <span className="text-[9px] text-dark-muted truncate block mt-0.5">@{acc.username} • {acc.engineeringField}</span>
+                          </div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveRememberedAccount(acc.id)}
+                          title="إلغاء حفظ الحساب"
+                          className="p-1 px-1.5 rounded-lg text-dark-muted hover:text-red-400 hover:bg-red-500/10 transition-colors mr-1.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
+
 
             {/* Platform Feature Highlights */}
             <div className="mt-8 pt-5 border-t border-dark-border/40 space-y-4">
@@ -469,6 +543,18 @@ export default function App() {
                   </span>
                 </div>
 
+                <div className="flex items-center justify-between py-1">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="rounded border-dark-border text-brand-primary bg-dark-bg focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5 cursor-pointerAccent"
+                    />
+                    <span className="text-xs font-medium text-dark-text">تذكرني واحفظ الحساب لتسجيل الدخول السريع 🛡️</span>
+                  </label>
+                </div>
+
                 <button
                   type="submit"
                   className="w-full bg-brand-primary hover:bg-brand-primary/95 text-white font-extrabold text-xs py-3 rounded-xl transition-all shadow-md shadow-brand-primary/15"
@@ -521,6 +607,22 @@ export default function App() {
                   onChange={(e) => setRegisterEmail(e.target.value)}
                   className="w-full bg-dark-bg border border-dark-border/85 rounded-xl px-3 py-2 text-xs text-dark-text focus:outline-none focus:border-brand-primary font-mono"
                 />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-dark-text block text-right">كلمة المرور الشخصية</label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    placeholder="اختر كلمة مرور (على الأقل 6 رموز)"
+                    value={registerPassword}
+                    onChange={(e) => setRegisterPassword(e.target.value)}
+                    className="w-full bg-dark-bg border border-dark-border/85 rounded-xl px-3 py-2 text-xs text-dark-text focus:outline-none focus:border-brand-primary font-mono pr-8 text-left"
+                  />
+                  <Lock className="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-dark-muted" />
+                </div>
               </div>
 
               <div className="space-y-1">
