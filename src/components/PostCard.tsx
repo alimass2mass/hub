@@ -28,11 +28,11 @@ export default function PostCard({ post, currentUser, onLike, onSave, onComment,
     const cleanCaption = post.caption ? post.caption.replace(/#\w+/g, '').trim() : '';
     const shareText = cleanCaption 
       ? (cleanCaption.length > 80 ? `${cleanCaption.substring(0, 80)}...` : cleanCaption)
-      : 'شاهد هذا المنشور الهندسي المتميز على منصة EngineerHub';
+      : 'شاهد هذا المنشور الهندسي المتميز على منصة ChemicalEngineersHub';
 
     const shareData = {
-      title: `منشور مهني بقلم م. ${post.fullName} | EngineerHub`,
-      text: `${shareText}\n\nتابع نقاشات الهندسة والمشاريع على EngineerHub 💻🚀`,
+      title: `منشور مهني بقلم م. ${post.fullName} | ChemicalEngineersHub`,
+      text: `${shareText}\n\nتابع نقاشات الهندسة والمشاريع على ChemicalEngineersHub 💻🚀`,
       url: shareUrl,
     };
 

@@ -56,7 +56,7 @@ export default function AdminPage({ currentUser }: AdminPageProps) {
           </div>
           <h2 className="text-xl font-extrabold text-white">غير مصرح بالدخول! 🚫</h2>
           <p className="text-xs text-red-400 leading-relaxed font-semibold">
-            هذه الصفحة مخصصة وحصرية كلياً للمدير العام لمنصة EngineerHub لغرض مراقبة سجلات الأمان والحماية التلقائية.
+            هذه الصفحة مخصصة وحصرية كلياً للمدير العام لمنصة ChemicalEngineersHub لغرض مراقبة سجلات الأمان والحماية التلقائية.
           </p>
           <div className="pt-2">
             <Navigate to="/" replace />

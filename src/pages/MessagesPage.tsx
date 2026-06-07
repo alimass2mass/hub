@@ -470,7 +470,7 @@ export default function MessagesPage({ currentUser }: MessagesPageProps) {
               </span>
               اتصال آمن ومُشفر بالكامل (Peer-to-Peer 256-bit)
             </div>
-            <span className="text-[10px] text-slate-400 font-medium">EngineerHub HD Voice & Video Call Engine</span>
+            <span className="text-[10px] text-slate-400 font-medium">ChemicalEngineersHub Secure Voice & Video Call Engine</span>
           </div>
 
           {/* Central segment: Avatar display or webcam video simulation */}

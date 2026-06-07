@@ -120,7 +120,7 @@ export default function FeedPage({
                   Developed by Engineer Ali Saifuddin Haider Al-Nawfal 2023
                 </h2>
                 <p className="text-[9px] text-dark-muted leading-relaxed">
-                  EngineerHub is a premium standalone Progressive Web App. Install now on your home screen for rapid access.
+                  ChemicalEngineersHub is a premium standalone Progressive Web App. Install now on your home screen for rapid access.
                 </p>
               </div>
 
@@ -249,7 +249,7 @@ export default function FeedPage({
             <div className="space-y-1">
               <h3 className="text-sm font-black text-white flex items-center gap-1.5">
                 <Download className="w-4.5 h-4.5 text-brand-primary" />
-                <span>تثبيت تطبيق EngineerHub على جهازك</span>
+                <span>تثبيت تطبيق ChemicalEngineersHub على جهازك</span>
               </h3>
               <p className="text-[10px] text-dark-muted leading-relaxed">
                 يدعم التطبيق تقنية تطبيقات الويب التقدمية (PWA) للتشغيل السريع والمباشر كـ تطبيق مستقل من الشاشة الرئيسية.

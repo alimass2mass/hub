@@ -49,14 +49,12 @@ export default function Layout({ user, notifications, onLogout, onQuickSwitchAcc
       <aside className={`hidden md:flex flex-col w-64 lg:w-72 bg-dark-card ${isRtl ? 'border-l' : 'border-r'} border-dark-border h-screen sticky top-0 p-5 flex-shrink-0 z-30`}>
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 px-3 py-4 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-secondary flex items-center justify-center font-bold text-white shadow-lg text-lg tracking-wider">
-            EH
-          </div>
+          <img src="/logo.png" alt="Logo" referrerPolicy="no-referrer" className="w-10 h-10 rounded-xl object-cover shadow-lg border border-dark-border" />
           <div className="flex flex-col">
-            <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-l from-brand-primary to-brand-secondary text-xl font-heading">
-              EngineerHub
+            <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-l from-brand-primary to-brand-secondary text-lg font-heading leading-tight">
+              ChemicalEngineersHub
             </span>
-            <span className="text-[10px] text-dark-muted font-medium">{t('nav.subheading')}</span>
+            <span className="text-[9px] text-dark-muted font-medium leading-none mt-1">الهيئة العامة للمهندسين الكيميائيين بالبصرة</span>
           </div>
         </Link>
 
@@ -172,15 +170,13 @@ export default function Layout({ user, notifications, onLogout, onQuickSwitchAcc
         <header className="md:hidden flex h-14 bg-dark-card/95 backdrop-blur-md border-b border-dark-border px-4 items-center justify-between sticky top-0 z-40 select-none">
           {/* Right Logo and name */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-secondary flex items-center justify-center font-bold text-white shadow-md text-xs tracking-wider">
-              EH
-            </div>
+            <img src="/logo.png" alt="Logo" referrerPolicy="no-referrer" className="w-8 h-8 rounded-xl object-cover shadow-md border border-dark-border" />
             <div className={`flex flex-col ${isRtl ? 'text-right' : 'text-left'}`}>
-              <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-l from-brand-primary to-brand-secondary text-sm font-sans leading-none">
-                EngineerHub
+              <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-l from-brand-primary to-brand-secondary text-xs sm:text-sm font-sans leading-none">
+                ChemicalEngineersHub
               </span>
               <span className="text-[8px] text-dark-muted font-medium block mt-0.5">
-                {t('nav.subheading')}
+                الهيئة العامة للمهندسين الكيميائيين بالبصرة
               </span>
             </div>
           </Link>

@@ -11,7 +11,7 @@ interface LanguageContextProps {
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
-// Substantial translation dictionary for the entire EngineerHub application
+// Substantial translation dictionary for the entire ChemicalEngineersHub application
 const translations: Record<LanguageType, Record<string, string>> = {
   ar: {
     // Nav & Layout
@@ -31,7 +31,7 @@ const translations: Record<LanguageType, Record<string, string>> = {
     'nav.developed_by': 'تطوير المهندس علي سيف الدين هيدر النوفل 2023',
 
     // Authentication Page
-    'auth.welcome': 'مرحباً بك في EngineerHub',
+    'auth.welcome': 'مرحباً بك في ChemicalEngineersHub',
     'auth.description': 'أكبر منصة وشبكة تواصل اجتماعية مخصصة للمهندسين العرب في مختلف التخصصات. شارك مشاريعك الفنية والبرمجية ونقاشاتك الآن!',
     'auth.feature1_title': 'تواصل احترافي آمن',
     'auth.feature1_desc': 'شبكة اجتماعية تفاعلية مخصصة كلياً لمشاريع وعنقود الأفكار الهندسية العربية.',
@@ -294,7 +294,7 @@ const translations: Record<LanguageType, Record<string, string>> = {
     'nav.developed_by': 'Developed by Eng. Ali Saifuddin Haider Al-Nawfal 2023',
 
     // Authentication Page
-    'auth.welcome': 'Welcome to EngineerHub',
+    'auth.welcome': 'Welcome to ChemicalEngineersHub',
     'auth.description': 'The largest social network and communications ecosystem tailored for Arab engineers across all disciplines. Share engineering updates & code projects now!',
     'auth.feature1_title': 'Secure Professional Workspace',
     'auth.feature1_desc': 'An interactive network entirely dedicated to Arab engineers, technical schemas, and structural proposals.',

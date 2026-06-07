@@ -66,7 +66,7 @@ export default function RightPanel({ suggestions, followingIds, onToggleFollow }
           الهدف من المنصة هو المساهمة في تنمية المهارات، مشاركة المشاريع الإنشائية والتطوير الميكانيكي والبرمجي وتبادل الخبرات المهنية في بيئة تواصل عربية احترافية وخلاقة.
         </p>
         <div className="text-[10px] text-dark-muted font-mono pt-2 border-t border-dark-border">
-          EngineerHub © {new Date().getFullYear()} • صنع بحب للعقول العربية
+          ChemicalEngineersHub © {new Date().getFullYear()} • صنع بحب للمهندسين الكيميائيين في البصرة
         </div>
       </div>
     </aside>

@@ -1,6 +1,6 @@
 {
-  "name": "EngineerHub",
-  "description": "منصة اجتماعية احترافية مخصصة للمهندسين - شبكة تواصل هندسية",
+  "name": "ChemicalEngineersHub",
+  "description": "منصة الهيئة العامة للمهندسين الكيميائيين في البصرة - شبكة تواصل واحتراف كيميائي",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

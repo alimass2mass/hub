@@ -57,7 +57,7 @@ const SEED_USERS: User[] = [
     username: 'admin',
     fullName: 'م. علي المسعودي',
     email: 'admin@engineerhub.com',
-    bio: 'مؤسس منصة EngineerHub | نجمع العقول الهندسية العربية في مكان واحد 💻✨',
+    bio: 'مؤسس منصة ChemicalEngineersHub | نجمع العقول الهندسية الكيميائية بالبصرة 💻✨',
     avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80',
     website: 'https://engineerhub.com',
     location: 'صنعاء | بغداد',
@@ -226,7 +226,7 @@ const SEED_POSTS: Post[] = [
     avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80',
     isVerified: true,
     type: 'post',
-    caption: 'أهلاً بكم زملائي المهندسين في EngineerHub! تم تطوير هذه النسخة لتوفير تجربة تفاعلية ممتازة، تدعم نقاشات العمل، القنوات العامة والتخصصية والمحادثات المباشرة، بالإضافة إلى القصص والمقاطع القصيرة (الريلز). نسعد بمقترحاتكم للتطوير! #مطورين #هندسة #تواصل #عربي💻🚀',
+    caption: 'أهلاً بكم زملائي المهندسين في ChemicalEngineersHub! تم تطوير هذه النسخة لتوفير تجربة تفاعلية ممتازة، تدعم نقاشات العمل، القنوات العامة والتخصصية والمحادثات المباشرة، بالإضافة إلى القصص والمقاطع القصيرة (الريلز). نسعد بمقترحاتكم للتطوير! #مطورين #هندسة_كيميائية #البصرة #تواصل💻🚀',
     location: 'غرفة المطورين الرئيسي',
     mediaUrls: [
       'https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=800&q=80'
@@ -382,48 +382,10 @@ export class MockDB {
       setJSON(KEYS.CURRENT_USER_ID, 'user_ahmed'); // Logged in as Ahmed by default to test out features!
     }
 
-    // Seed remembered accounts for easy quick sign-in if empty or only 1 exists
+    // Do not seed remembered accounts with default demo accounts as requested by user
     const remembered = getJSON<any[]>('eh_remembered_accounts', []);
     if (remembered.length === 0) {
-      const initialRemembered = [
-        {
-          id: 'user_super_admin',
-          username: 'alisaifaldeen',
-          fullName: 'المدير علي سيف الدين',
-          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-          email: 'alisaifaldeen12@gmail.com',
-          engineeringField: 'هندسة برمجيات',
-          password_hash: 'SecurePassword123!'
-        },
-        {
-          id: 'user_ahmed',
-          username: 'ahmed_eng',
-          fullName: 'م. أحمد الجبوري',
-          avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
-          email: 'ahmed@example.com',
-          engineeringField: 'هندسة مدنية',
-          password_hash: '123456'
-        },
-        {
-          id: 'user_sara',
-          username: 'sara_mech',
-          fullName: 'م. سارة المهيري',
-          avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
-          email: 'sara@example.com',
-          engineeringField: 'هندسة ميكانيكية',
-          password_hash: '123456'
-        },
-        {
-          id: 'user_admin',
-          username: 'admin',
-          fullName: 'م. علي المسعودي',
-          avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80',
-          email: 'admin@engineerhub.com',
-          engineeringField: 'هندسة برمجيات',
-          password_hash: '123456'
-        }
-      ];
-      setJSON('eh_remembered_accounts', initialRemembered);
+      setJSON('eh_remembered_accounts', []);
     }
   }
 
@@ -1457,7 +1419,9 @@ export class MockDB {
 
   // Remembered Accounts Helpers for easy logins on the device
   static getRememberedAccounts(): { id: string; username: string; fullName: string; avatarUrl: string; email: string; engineeringField: string; password_hash: string }[] {
-    return getJSON<any[]>('eh_remembered_accounts', []);
+    const list = getJSON<any[]>('eh_remembered_accounts', []);
+    const demoIds = ['user_super_admin', 'user_ahmed', 'user_sara', 'user_admin'];
+    return list.filter(acc => !demoIds.includes(acc.id));
   }
 
   static addRememberedAccount(user: any, password_hash: string) {
