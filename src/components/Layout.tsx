@@ -8,10 +8,11 @@ interface LayoutProps {
   user: User | null;
   notifications: AppNotification[];
   onLogout: () => void;
+  onQuickSwitchAccount?: (username: string) => void;
   children: React.ReactNode;
 }
 
-export default function Layout({ user, notifications, onLogout, children }: LayoutProps) {
+export default function Layout({ user, notifications, onLogout, onQuickSwitchAccount, children }: LayoutProps) {
   const navigate = useNavigate();
   const unreadCount = notifications.filter(n => !n.isRead).length;
   const { t, isRtl } = useLanguage();
@@ -110,6 +111,42 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
               </div>
             </Link>
 
+            {onQuickSwitchAccount && (
+              <div className="bg-dark-bg/45 border border-dark-border p-2 rounded-xl space-y-2 select-none">
+                <span className="text-[8px] font-black text-brand-primary block uppercase tracking-wider text-right">
+                  🔄 تبديل الحساب السريع (للمحاكاة السهلة):
+                </span>
+                <div className="flex items-center justify-around gap-1 select-none">
+                  {[
+                    { username: 'alisaifaldeen', name: 'علي', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=alisaifaldeen' },
+                    { username: 'sara_mech', name: 'سارة', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=sara_mech' },
+                    { username: 'ahmed_eng', name: 'أحمد', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ahmed_eng' },
+                    { username: 'admin', name: 'المشرف', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=admin' }
+                  ].map((acc) => (
+                    <button
+                      key={acc.username}
+                      type="button"
+                      onClick={() => onQuickSwitchAccount(acc.username)}
+                      disabled={user?.username === acc.username}
+                      className={`relative flex flex-col items-center gap-1 p-1 rounded-lg transition-all ${
+                        user?.username === acc.username
+                          ? 'ring-1.5 ring-brand-primary bg-brand-primary/15'
+                          : 'hover:bg-dark-border/40 cursor-pointer opacity-65 hover:opacity-100'
+                      }`}
+                      title={`تبديل الحساب إلى م. ${acc.name}`}
+                    >
+                      <img
+                        src={acc.avatar}
+                        alt={acc.name}
+                        className="w-6 h-6 rounded object-cover border border-dark-border"
+                      />
+                      <span className="text-[7.5px] font-extrabold text-dark-text leading-none">{acc.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <button
               onClick={onLogout}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all font-semibold text-xs"
@@ -150,6 +187,21 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
 
           {/* Left Action Quick shortcuts */}
           <div className="flex items-center gap-2.5">
+            {onQuickSwitchAccount && (
+              <button
+                type="button"
+                onClick={() => {
+                  const usernames = ['alisaifaldeen', 'sara_mech', 'ahmed_eng', 'admin'];
+                  const currentIndex = usernames.indexOf(user?.username || '');
+                  const nextIndex = (currentIndex + 1) % usernames.length;
+                  onQuickSwitchAccount(usernames[nextIndex]);
+                }}
+                className="p-1.5 rounded-xl bg-brand-primary/15 border border-brand-primary/20 text-brand-primary font-black text-[8px] sm:text-[9px] hover:bg-brand-primary hover:text-white transition-all scale-100 active:scale-95 cursor-pointer"
+                title="تبديل سريع للحسابات"
+              >
+                👥 تبديل
+              </button>
+            )}
             <Link
               to="/games"
               className="p-1.5 rounded-xl bg-brand-primary/10 border border-brand-primary/25 text-brand-primary hover:bg-brand-primary hover:text-white transition-all flex items-center gap-1"

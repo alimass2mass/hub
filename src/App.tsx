@@ -366,46 +366,7 @@ export default function App() {
                 أكبر منصة وشبكة تواصل اجتماعية مخصصة للمهندسين العرب في مختلف التخصصات. شارك مشاريعك الفنية والبرمجية ونقاشاتك الآن!
               </p>
 
-              {rememberedAccounts.length > 0 && (
-                <div className="mt-6 p-4 bg-dark-card/80 rounded-2xl border border-dark-border/80">
-                  <span className="text-[10px] font-black text-brand-primary block mb-2.5 select-none text-right">
-                    👤 الحسابات المحفوظة (تسجيل دخول سريع):
-                  </span>
-                  <div className="space-y-2 max-h-[170px] overflow-y-auto pr-0.5">
-                    {rememberedAccounts.map((acc) => (
-                      <div 
-                        key={acc.id}
-                        className="flex items-center justify-between bg-dark-bg/75 p-2 rounded-xl hover:border-brand-primary/40 border border-transparent transition-all group scale-100 hover:scale-[1.01]"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => handleLoginWithRememberedAccount(acc)}
-                          className="flex flex-1 items-center gap-2.5 text-right cursor-pointer"
-                        >
-                          <img 
-                            src={acc.avatarUrl} 
-                            alt={acc.fullName} 
-                            referrerPolicy="no-referrer"
-                            className="w-8 h-8 rounded-lg object-cover bg-dark-card border border-dark-border group-hover:border-brand-primary"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-[11px] font-bold text-white truncate leading-tight">{acc.fullName}</h4>
-                            <span className="text-[9px] text-dark-muted truncate block mt-0.5">@{acc.username} • {acc.engineeringField}</span>
-                          </div>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveRememberedAccount(acc.id)}
-                          title="إلغاء حفظ الحساب"
-                          className="p-1 px-1.5 rounded-lg text-dark-muted hover:text-red-400 hover:bg-red-500/10 transition-colors mr-1.5"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+
             </div>
 
 
@@ -416,33 +377,9 @@ export default function App() {
                   <CheckCircle2 className="w-3 h-3" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white">تواصل احترافي آمن</h4>
-                  <p className="text-[10px] text-dark-muted mt-0.5 leading-normal">
-                    شبكة اجتماعية تفاعلية مخصصة كلياً لمشاريع وعنقود الأفكار الهندسية العربية.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5 text-right">
-                <div className="w-5 h-5 rounded-lg bg-brand-primary/10 flex items-center justify-center text-brand-primary flex-shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3 h-3" />
-                </div>
-                <div>
                   <h4 className="text-xs font-bold text-white">حلول ومخططات هندسية</h4>
                   <p className="text-[10px] text-dark-muted mt-0.5 leading-normal">
                     استكشف وشارك التصاميم الإنشائية والميكانيكية والمشاريع التكنولوجية بسهولة.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5 text-right">
-                <div className="w-5 h-5 rounded-lg bg-brand-primary/10 flex items-center justify-center text-brand-primary flex-shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3 h-3" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-white">محادثات وحلقات مرئية</h4>
-                  <p className="text-[10px] text-dark-muted mt-0.5 leading-normal">
-                    تواصل مباشرة مع الزملاء عبر غرف للمناقشات الصوتية والريلز اليومية والمراسلات المشفرة.
                   </p>
                 </div>
               </div>
@@ -565,6 +502,8 @@ export default function App() {
               </form>
             )}
 
+
+
             <div className="relative flex py-5 items-center">
               <div className="flex-grow border-t border-dark-border/60"></div>
               <span className="flex-shrink mx-3 text-[10px] text-dark-muted font-bold">أو تسجيل حساب جديد</span>
@@ -663,7 +602,12 @@ export default function App() {
 
   return (
     <HashRouter>
-      <Layout user={currentUser} notifications={notifications} onLogout={handleLogout}>
+      <Layout 
+        user={currentUser} 
+        notifications={notifications} 
+        onLogout={handleLogout}
+        onQuickSwitchAccount={handleQuickSwitchAccount}
+      >
         <Routes>
           <Route
             path="/"
@@ -705,6 +649,7 @@ export default function App() {
                 currentUser={currentUser}
                 onLike={handleLike}
                 onSave={handleSave}
+                onDelete={handleDeletePost}
               />
             }
           />

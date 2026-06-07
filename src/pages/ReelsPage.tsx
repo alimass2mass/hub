@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { Post, User } from '../types';
-import { Heart, MessageCircle, Volume2, VolumeX, CheckCircle2, Bookmark } from 'lucide-react';
+import { Heart, MessageCircle, Volume2, VolumeX, CheckCircle2, Bookmark, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface ReelsPageProps {
   reels: Post[];
   currentUser: User | null;
   onLike: (postId: string) => void;
   onSave: (postId: string) => void;
+  onDelete?: (postId: string) => void;
 }
 
-export default function ReelsPage({ reels, currentUser, onLike, onSave }: ReelsPageProps) {
+export default function ReelsPage({ reels, currentUser, onLike, onSave, onDelete }: ReelsPageProps) {
   const [isMuted, setIsMuted] = useState(true);
   const [likedReels, setLikedReels] = useState<string[]>([]);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const handleLikeReel = (id: string) => {
     onLike(id);
@@ -20,10 +22,21 @@ export default function ReelsPage({ reels, currentUser, onLike, onSave }: ReelsP
     );
   };
 
+  const scrollReel = (direction: 'next' | 'prev') => {
+    const el = document.getElementById('reels-scroller');
+    if (el) {
+      const height = el.clientHeight || window.innerHeight;
+      el.scrollBy({
+        top: direction === 'next' ? height : -height,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const reelList = reels.filter((r) => r.type === 'reel');
 
   return (
-    <div className="h-screen bg-black overflow-y-scroll scroll-snap-y-mandatory select-none text-right scrollbar-none snapped-y-container">
+    <div id="reels-scroller" className="h-screen bg-black overflow-y-scroll scroll-snap-y-mandatory select-none text-right scrollbar-none snapped-y-container">
       {reelList.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-neutral-400 gap-4">
           <p className="text-sm">لا توجد مقاطع ريلز هندسية متوفرة الآن.</p>
@@ -51,16 +64,69 @@ export default function ReelsPage({ reels, currentUser, onLike, onSave }: ReelsP
 
                 {/* Top header options */}
                 <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
-                  <button
-                    onClick={() => setIsMuted(!isMuted)}
-                    className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-sm"
-                  >
-                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setIsMuted(!isMuted)}
+                      className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-sm"
+                    >
+                      {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                    </button>
+                    {currentUser && currentUser.id === reel.userId && onDelete && (
+                      <div className="flex items-center gap-1.5 pointer-events-auto">
+                        {confirmDeleteId === reel.id ? (
+                          <div className="flex items-center gap-1 bg-red-600 rounded-full p-1 border border-red-500 shadow-xl z-20 transition-all">
+                            <button
+                              onClick={() => {
+                                onDelete(reel.id);
+                                setConfirmDeleteId(null);
+                              }}
+                              className="px-2.5 py-1 text-[9px] font-black text-white hover:bg-black/20 rounded-full cursor-pointer transition-colors"
+                            >
+                              تأكيد حذف الريل ⚠️
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(null)}
+                              className="px-2 py-1 text-[9px] font-bold text-white/80 hover:text-white hover:bg-black/20 rounded-full cursor-pointer transition-colors"
+                            >
+                              إلغاء
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteId(reel.id)}
+                            className="p-2 rounded-full bg-red-600/45 hover:bg-red-600 text-white backdrop-blur-sm transition-all hover:scale-105"
+                            title="حذف مقطع الريلز ورشة العمل"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <span className="text-xs font-bold text-white bg-brand-primary px-3 py-1 rounded-full shadow-md">
                     ريلز التخصصات
                   </span>
                 </div>
+
+                {/* Left side floating navigation arrows for easy desktop/iframe use */}
+                {reelList.length > 1 && (
+                  <div className="absolute left-4 bottom-24 flex flex-col gap-3 z-10">
+                    <button
+                      onClick={() => scrollReel('prev')}
+                      className="p-3 rounded-full bg-black/55 backdrop-blur-sm border border-white/10 text-white hover:scale-110 active:scale-95 transition-all shadow-lg cursor-pointer"
+                      title="الريل السابق"
+                    >
+                      <ChevronUp className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => scrollReel('next')}
+                      className="p-3 rounded-full bg-black/55 backdrop-blur-sm border border-white/10 text-white hover:scale-110 active:scale-95 transition-all shadow-lg cursor-pointer"
+                      title="الريل التالي"
+                    >
+                      <ChevronDown className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
 
                 {/* Right side floating action widgets (Instagram style spec) */}
                 <div className="absolute right-4 bottom-24 flex flex-col items-center gap-5 z-10 text-white select-none">

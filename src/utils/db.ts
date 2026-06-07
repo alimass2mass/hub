@@ -381,6 +381,50 @@ export class MockDB {
       setJSON(KEYS.LIKED_POSTS, []);
       setJSON(KEYS.CURRENT_USER_ID, 'user_ahmed'); // Logged in as Ahmed by default to test out features!
     }
+
+    // Seed remembered accounts for easy quick sign-in if empty or only 1 exists
+    const remembered = getJSON<any[]>('eh_remembered_accounts', []);
+    if (remembered.length === 0) {
+      const initialRemembered = [
+        {
+          id: 'user_super_admin',
+          username: 'alisaifaldeen',
+          fullName: 'المدير علي سيف الدين',
+          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+          email: 'alisaifaldeen12@gmail.com',
+          engineeringField: 'هندسة برمجيات',
+          password_hash: 'SecurePassword123!'
+        },
+        {
+          id: 'user_ahmed',
+          username: 'ahmed_eng',
+          fullName: 'م. أحمد الجبوري',
+          avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+          email: 'ahmed@example.com',
+          engineeringField: 'هندسة مدنية',
+          password_hash: '123456'
+        },
+        {
+          id: 'user_sara',
+          username: 'sara_mech',
+          fullName: 'م. سارة المهيري',
+          avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+          email: 'sara@example.com',
+          engineeringField: 'هندسة ميكانيكية',
+          password_hash: '123456'
+        },
+        {
+          id: 'user_admin',
+          username: 'admin',
+          fullName: 'م. علي المسعودي',
+          avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80',
+          email: 'admin@engineerhub.com',
+          engineeringField: 'هندسة برمجيات',
+          password_hash: '123456'
+        }
+      ];
+      setJSON('eh_remembered_accounts', initialRemembered);
+    }
   }
 
   // Auth Operations
@@ -481,17 +525,22 @@ export class MockDB {
     }
 
     const users = getJSON<User[]>(KEYS.USERS, []);
-    const user = users.find(u => u.username.toLowerCase() === identifier.toLowerCase() || u.email.toLowerCase() === identifier.toLowerCase());
+    const cleanIdentifier = (identifier || '').trim().toLowerCase();
+    const user = users.find(u => {
+      const uUsername = (u.username || '').trim().toLowerCase();
+      const uEmail = (u.email || '').trim().toLowerCase();
+      return uUsername === cleanIdentifier || uEmail === cleanIdentifier;
+    });
     
     if (!user) {
       return { user: null, error: 'اسم المستخدم أو البريد الإلكتروني غير صحيح' };
     }
 
     // Check credentials (plain text mock check with fallback of '123456')
-    const enteredPass = password_hash_or_plain || '123456';
-    const actualPass = user.password_hash || '123456';
+    const enteredPassClean = (password_hash_or_plain || '123456').trim();
+    const actualPassClean = (user.password_hash || '123456').trim();
 
-    if (actualPass !== enteredPass) {
+    if (actualPassClean !== enteredPassClean && user.password_hash !== password_hash_or_plain) {
       this.incrementFailedAttempts(identifier);
       const updatedAttempts = this.getFailedAttempts(identifier);
       const remainingHits = 3 - updatedAttempts.count;
