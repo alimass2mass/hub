@@ -112,6 +112,8 @@ export interface Conversation {
   lastMessageAt?: string;
   unreadCount: number;
   isOnline?: boolean;
+  isLastMessageMine?: boolean;
+  isLastMessageRead?: boolean;
 }
 
 export interface Channel {

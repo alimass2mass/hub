@@ -3,7 +3,8 @@ import { Conversation, Message, User } from '../types';
 import { MockDB } from '../utils/db';
 import { 
   Send, CheckCircle2, Search, MessageSquare, AlertCircle, 
-  Phone, Video, Mic, MicOff, VideoOff, Volume2, VolumeX, X, ArrowRight, PhoneOff 
+  Phone, Video, Mic, MicOff, VideoOff, Volume2, VolumeX, X, ArrowRight, PhoneOff,
+  Check, CheckCheck
 } from 'lucide-react';
 
 interface MessagesPageProps {
@@ -72,6 +73,37 @@ export default function MessagesPage({ currentUser }: MessagesPageProps) {
     }
   };
 
+  const simulateOpponentReading = (convId: string, opposingUserId: string) => {
+    // Simulating the remote user noticing our message, opening it and viewing the conversation
+    setTimeout(() => {
+      const stored = localStorage.getItem('eh_messages');
+      if (stored) {
+        try {
+          const allMsgs = JSON.parse(stored) as Message[];
+          let changed = false;
+          const updated = allMsgs.map(m => {
+            if (m.conversationId === convId && m.senderId === currentUser?.id && !m.isRead) {
+              m.isRead = true;
+              changed = true;
+            }
+            return m;
+          });
+          
+          if (changed) {
+            localStorage.setItem('eh_messages', JSON.stringify(updated));
+            // If the user's active conversation is still this conversation, fetch the updated messages logs
+            setMessages(prev => {
+              return MockDB.getMessages(convId);
+            });
+            refreshConvs();
+          }
+        } catch (err) {
+          console.error('Error in read receipts simulation:', err);
+        }
+      }
+    }, 1000);
+  };
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim() || !activeConversation) return;
@@ -80,6 +112,9 @@ export default function MessagesPage({ currentUser }: MessagesPageProps) {
     const newMsg = MockDB.sendMessage(activeConversation.userId, inputText.trim());
     setMessages((prev) => [...prev, newMsg]);
     setInputText('');
+
+    // Simulate opponent opening and reading our message
+    simulateOpponentReading(activeConversation.id, activeConversation.userId);
 
     // Trigger instant replies from mock users to make details highly interactive!
     triggerMockReply(activeConversation.userId);
@@ -237,10 +272,21 @@ export default function MessagesPage({ currentUser }: MessagesPageProps) {
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                      <p className="text-[11px] text-dark-muted truncate pr-1 flex-1">
-                        {conv.lastMessage || 'ابدأ محادثة مهنية جديدة...'}
-                      </p>
+                    <div className="flex justify-between items-center gap-1.5">
+                      <div className="flex items-center gap-1 min-w-0 flex-1">
+                        {conv.isLastMessageMine && (
+                          <span className="flex-shrink-0">
+                            {conv.isLastMessageRead ? (
+                              <CheckCheck className="w-3.5 h-3.5 text-sky-400" />
+                            ) : (
+                              <Check className="w-3.5 h-3.5 text-slate-400" />
+                            )}
+                          </span>
+                        )}
+                        <p className="text-[11px] text-dark-muted truncate flex-1 block">
+                          {conv.lastMessage || 'ابدأ محادثة مهنية جديدة...'}
+                        </p>
+                      </div>
                       {conv.unreadCount > 0 && (
                         <span className="bg-brand-primary text-white font-bold text-[9px] px-1.5 py-0.5 rounded-full min-w-4 flex items-center justify-center">
                           {conv.unreadCount}
@@ -346,13 +392,24 @@ export default function MessagesPage({ currentUser }: MessagesPageProps) {
                         }`}
                       >
                         <p className="font-medium whitespace-pre-wrap">{m.text}</p>
-                        <span
-                          className={`text-[8px] mt-1.5 block text-left ${
-                            isMine ? 'text-white/70' : 'text-dark-muted'
-                          } font-mono`}
-                        >
-                          {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                        <div className="flex items-center justify-between gap-1.5 mt-1.5">
+                          <span
+                            className={`text-[8px] ${
+                              isMine ? 'text-white/70' : 'text-dark-muted'
+                            } font-mono`}
+                          >
+                            {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          {isMine && (
+                            <div className="flex items-center" title={m.isRead ? "تمت القراءة" : "تم الإرسال"}>
+                              {m.isRead ? (
+                                <CheckCheck className="w-3.5 h-3.5 text-sky-300 animate-pulse" />
+                              ) : (
+                                <Check className="w-3.5 h-3.5 text-white/50" />
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );

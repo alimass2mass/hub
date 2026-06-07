@@ -5,14 +5,14 @@
   --font-sans: "Cairo", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   
-  /* Slate/Teal color theme suited for professional engineers */
-  --color-brand-primary: #0d9488;      /* Teal */
-  --color-brand-secondary: #14b8a6;    /* Light Teal */
-  --color-dark-bg: #0a0e17;            /* Deep Space Blue/Gray */
-  --color-dark-card: #151b26;          /* Deep Card Gray */
-  --color-dark-border: #232d3d;        /* Grid/Border */
-  --color-dark-muted: #64748b;         /* Muted Slate Text */
-  --color-dark-text: #f1f5f9;          /* Primary Slate white text */
+  /* Eye-safe Slate and Matte Teal color theme optimized for reducing visual fatigue */
+  --color-brand-primary: #0d9488;      /* Soothing Matte Teal */
+  --color-brand-secondary: #14b8a6;    /* Soft Mint Accent */
+  --color-dark-bg: #0f172a;            /* Slate 900 - Gentle Deep Slate Gray (Blocks aggressive cold blue glares) */
+  --color-dark-card: #1e293b;          /* Slate 800 - Velvet Card Contrast */
+  --color-dark-border: #334155;        /* Slate 700 - Subdued borders to prevent grid line stress */
+  --color-dark-muted: #94a3b8;         /* Slate 400 - Calm matte text to decrease contrast burden */
+  --color-dark-text: #e2e8f0;          /* Slate 200 - Soft Off-White (Anti-glare typography, much easier for Astigmatism) */
 }
 
 /* Animations and scrolling styles */
@@ -21,10 +21,10 @@
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0e17;
+  background: #0f172a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #232d3d;
+  background: #334155;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {

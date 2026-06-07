@@ -1125,7 +1125,9 @@ export class MockDB {
         lastMessage: lastMsg.text,
         lastMessageAt: lastMsg.createdAt,
         unreadCount,
-        isOnline: opposingUserId !== 'user_sara' // seed online statuses
+        isOnline: opposingUserId !== 'user_sara', // seed online statuses
+        isLastMessageMine: lastMsg.senderId === curr.id,
+        isLastMessageRead: lastMsg.isRead
       });
     });
 

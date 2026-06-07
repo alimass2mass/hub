@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Home, Compass, Film, Search, Bell, MessageSquare, Hash, PlusSquare, User as UserIcon, LogOut, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Home, Compass, Film, Search, Bell, MessageSquare, Hash, PlusSquare, User as UserIcon, LogOut, CheckCircle2, ShieldCheck, Gamepad2 } from 'lucide-react';
 import { User, AppNotification } from '../types';
 import { useLanguage } from './LanguageContext';
 
@@ -31,6 +31,7 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
     { to: '/notifications', icon: Bell, label: t('nav.notifications'), badge: unreadCount },
     { to: '/messages', icon: MessageSquare, label: t('nav.messages') },
     { to: '/channels', icon: Hash, label: t('nav.channels') },
+    { to: '/games', icon: Gamepad2, label: isRtl ? 'ألعاب المهندسين 🎮' : 'Engineer Games' },
     { to: '/create', icon: PlusSquare, label: t('nav.create') },
     { to: `/profile/${user?.username || ''}`, icon: UserIcon, label: t('nav.profile') }
   ];
@@ -149,6 +150,14 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
 
           {/* Left Action Quick shortcuts */}
           <div className="flex items-center gap-2.5">
+            <Link
+              to="/games"
+              className="p-1.5 rounded-xl bg-brand-primary/10 border border-brand-primary/25 text-brand-primary hover:bg-brand-primary hover:text-white transition-all flex items-center gap-1"
+              title={isRtl ? 'ألعاب السيارات' : 'Games Hub'}
+            >
+              <Gamepad2 className="w-4.5 h-4.5 animate-bounce" />
+              <span className="text-[10px] font-black hidden sm:inline">{isRtl ? 'لعبة السيارات' : 'Car GP'}</span>
+            </Link>
             {user?.email === 'alisaifaldeen12@gmail.com' && (
               <Link
                 to="/admin"

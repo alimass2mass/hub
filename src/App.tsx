@@ -14,6 +14,7 @@ import EditProfilePage from './pages/EditProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
 import CreatePostPage from './pages/CreatePostPage';
 import AdminPage from './pages/AdminPage';
+import GamesPage from './pages/GamesPage';
 import StoryViewer from './components/StoryViewer';
 import { Sparkles, MessageSquare, KeyRound, UserCheck, Briefcase, X, Upload, Camera, Lock, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
@@ -710,6 +711,7 @@ export default function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/messages" element={<MessagesPage currentUser={currentUser} />} />
           <Route path="/channels" element={<ChannelsPage currentUser={currentUser} />} />
+          <Route path="/games" element={<GamesPage currentUser={currentUser} />} />
           <Route
             path="/profile/:username"
             element={
