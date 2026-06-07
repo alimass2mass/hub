@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Heart, MessageCircle, Bookmark, CheckCircle2, MoreHorizontal, Trash2, Send, ChevronRight, ChevronLeft, Share2, Check, Volume2, VolumeX } from 'lucide-react';
 import { Post, Comment, User } from '../types';
+import { MockDB } from '../utils/db';
 
 interface PostCardProps {
   key?: string;
@@ -301,8 +302,29 @@ export default function PostCard({ post, currentUser, onLike, onSave, onComment,
                     className="w-7 h-7 rounded-lg object-cover border border-dark-border flex-shrink-0"
                   />
                   <div className="flex-1 bg-dark-border/20 p-2.5 rounded-xl">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="font-bold text-[11px] text-brand-primary font-mono">@{comment.username}</span>
+                    <div className="flex justify-between items-center mb-1 flex-wrap gap-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-bold text-[11px] text-brand-primary font-mono">@{comment.username}</span>
+                        {(() => {
+                          const status = MockDB.getUserProfile(comment.username)?.professionalStatus;
+                          if (!status || status === 'غير محدد') return null;
+                          return (
+                            <span className={`inline-flex items-center gap-1 text-[8px] font-extrabold px-1.5 py-0.5 rounded-full border leading-none select-none ${
+                              status === 'متاح للعمل' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' :
+                              status === 'مشغول في مشروع' ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' :
+                              status === 'أبحث عن فرص' ? 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' :
+                              'text-dark-muted bg-dark-border/40 border-dark-border/60'
+                            }`}>
+                              <span className={`w-1 h-1 rounded-full ${
+                                status === 'متاح للعمل' ? 'bg-emerald-400 animate-pulse' :
+                                status === 'مشغول في مشروع' ? 'bg-yellow-400' :
+                                status === 'أبحث عن فرص' ? 'bg-cyan-400 animate-pulse' : 'bg-dark-muted'
+                              }`} />
+                              {status}
+                            </span>
+                          );
+                        })()}
+                      </div>
                       <span className="text-[9px] text-dark-muted">
                         {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>

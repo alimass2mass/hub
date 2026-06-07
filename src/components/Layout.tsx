@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { Home, Compass, Film, Search, Bell, MessageSquare, Hash, PlusSquare, User as UserIcon, LogOut, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { User, AppNotification } from '../types';
+import { useLanguage } from './LanguageContext';
 
 interface LayoutProps {
   user: User | null;
@@ -13,6 +14,7 @@ interface LayoutProps {
 export default function Layout({ user, notifications, onLogout, children }: LayoutProps) {
   const navigate = useNavigate();
   const unreadCount = notifications.filter(n => !n.isRead).length;
+  const { t, isRtl } = useLanguage();
 
   interface NavItem {
     to: string;
@@ -22,27 +24,27 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
   }
 
   const NAV_ITEMS: NavItem[] = [
-    { to: '/', icon: Home, label: 'الرئيسية' },
-    { to: '/explore', icon: Compass, label: 'استكشاف' },
-    { to: '/reels', icon: Film, label: 'ريلز الهندسية' },
-    { to: '/search', icon: Search, label: 'بحث' },
-    { to: '/notifications', icon: Bell, label: 'الإشعارات', badge: unreadCount },
-    { to: '/messages', icon: MessageSquare, label: 'الرسائل' },
-    { to: '/channels', icon: Hash, label: 'القنوات الهندسية' },
-    { to: '/create', icon: PlusSquare, label: 'نشر جديد' },
-    { to: `/profile/${user?.username || ''}`, icon: UserIcon, label: 'الملف الشخصي' }
+    { to: '/', icon: Home, label: t('nav.home') },
+    { to: '/explore', icon: Compass, label: t('nav.explore') },
+    { to: '/reels', icon: Film, label: t('nav.reels') },
+    { to: '/search', icon: Search, label: t('nav.search') },
+    { to: '/notifications', icon: Bell, label: t('nav.notifications'), badge: unreadCount },
+    { to: '/messages', icon: MessageSquare, label: t('nav.messages') },
+    { to: '/channels', icon: Hash, label: t('nav.channels') },
+    { to: '/create', icon: PlusSquare, label: t('nav.create') },
+    { to: `/profile/${user?.username || ''}`, icon: UserIcon, label: t('nav.profile') }
   ];
 
   const adminItem: NavItem[] = user?.email === 'alisaifaldeen12@gmail.com'
-    ? [{ to: '/admin', icon: ShieldCheck, label: 'لوحة الإدارة الأمنية' }]
+    ? [{ to: '/admin', icon: ShieldCheck, label: t('nav.admin') }]
     : [];
 
   const visibleNavItems: NavItem[] = [...NAV_ITEMS, ...adminItem];
 
   return (
-    <div className="min-h-screen bg-dark-bg text-dark-text flex flex-col md:flex-row antialiased">
+    <div className={`min-h-screen bg-dark-bg text-dark-text flex flex-col md:flex-row antialiased ${isRtl ? 'rtl' : 'ltr'}`}>
       {/* Desktop Left Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-dark-card border-l border-dark-border h-screen sticky top-0 p-5 flex-shrink-0 z-30">
+      <aside className={`hidden md:flex flex-col w-64 lg:w-72 bg-dark-card ${isRtl ? 'border-l' : 'border-r'} border-dark-border h-screen sticky top-0 p-5 flex-shrink-0 z-30`}>
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 px-3 py-4 mb-6">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-secondary flex items-center justify-center font-bold text-white shadow-lg text-lg tracking-wider">
@@ -52,7 +54,7 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
             <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-l from-brand-primary to-brand-secondary text-xl font-heading">
               EngineerHub
             </span>
-            <span className="text-[10px] text-dark-muted font-medium">مجتمع المهندسين العرب</span>
+            <span className="text-[10px] text-dark-muted font-medium">{t('nav.subheading')}</span>
           </div>
         </Link>
 
@@ -67,7 +69,7 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
                 className={({ isActive }) =>
                   `flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group text-sm font-semibold ${
                     isActive
-                      ? 'bg-brand-primary/10 text-brand-primary border-r-4 border-brand-primary'
+                      ? `bg-brand-primary/10 text-brand-primary ${isRtl ? 'border-r-4 border-brand-primary' : 'border-l-4 border-brand-primary'}`
                       : 'text-dark-muted hover:bg-dark-border/40 hover:text-dark-text'
                   }`
                 }
@@ -98,7 +100,7 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
                 alt={user.fullName}
                 className="w-10 h-10 rounded-xl object-cover border border-dark-border"
               />
-              <div className="flex-1 min-w-0 text-right">
+              <div className={`flex-1 min-w-0 ${isRtl ? 'text-right' : 'text-left'}`}>
                 <div className="flex items-center gap-1">
                   <span className="font-bold text-xs truncate">{user.fullName}</span>
                   {user.isVerified && <CheckCircle2 className="w-3.5 h-3.5 text-brand-primary fill-brand-primary/10" />}
@@ -112,14 +114,14 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all font-semibold text-xs"
             >
               <LogOut className="w-4 h-4" />
-              <span>تسجيل الخروج</span>
+              <span>{t('nav.logout')}</span>
             </button>
 
             {/* Developer Digital Signature with brand styles */}
             <div className="border-t border-dark-border/40 pt-3 text-center">
-              <span className="text-[9px] text-dark-muted/65 block">Platform Engineering</span>
+              <span className="text-[9px] text-dark-muted/65 block">{t('nav.platform_eng')}</span>
               <span className="text-[10px] text-brand-primary font-bold tracking-tight hover:text-brand-secondary transition-colors block mt-0.5 select-all leading-relaxed">
-                Developed by Engineer Ali Saifuddin Haider Al-Nawfal 2023
+                {t('nav.developed_by')}
               </span>
             </div>
           </div>
@@ -128,30 +130,30 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
 
       {/* Main Content Area */}
       <main className="flex-1 min-w-0 min-h-screen pb-20 md:pb-0 flex flex-col">
-        {/* Mobile Top Header (Matches Instagram spec) */}
+        {/* Mobile Top Header */}
         <header className="md:hidden flex h-14 bg-dark-card/95 backdrop-blur-md border-b border-dark-border px-4 items-center justify-between sticky top-0 z-40 select-none">
           {/* Right Logo and name */}
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-secondary flex items-center justify-center font-bold text-white shadow-md text-xs tracking-wider">
               EH
             </div>
-            <div className="flex flex-col text-right">
+            <div className={`flex flex-col ${isRtl ? 'text-right' : 'text-left'}`}>
               <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-l from-brand-primary to-brand-secondary text-sm font-sans leading-none">
                 EngineerHub
               </span>
               <span className="text-[8px] text-dark-muted font-medium block mt-0.5">
-                مجتمع المهندسين العرب
+                {t('nav.subheading')}
               </span>
             </div>
           </Link>
 
-          {/* Left Action Quick shortcuts: Notifications / Messages */}
+          {/* Left Action Quick shortcuts */}
           <div className="flex items-center gap-2.5">
             {user?.email === 'alisaifaldeen12@gmail.com' && (
               <Link
                 to="/admin"
                 className="p-1.5 rounded-xl bg-brand-primary/10 border border-brand-primary/25 text-brand-primary hover:text-white transition-colors"
-                title="لوحة الإدارة"
+                title={t('nav.admin')}
               >
                 <ShieldCheck className="w-4 h-4" />
               </Link>
@@ -159,7 +161,7 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
             <Link 
               to="/notifications" 
               className="p-1.5 rounded-xl bg-dark-bg/60 border border-dark-border/40 text-dark-muted hover:text-dark-text relative transition-colors"
-              title="الإشعارات"
+              title={t('nav.notifications')}
             >
               <Bell className="w-4.5 h-4.5" />
               {unreadCount > 0 && (
@@ -171,7 +173,7 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
             <Link 
               to="/messages" 
               className="p-1.5 rounded-xl bg-dark-bg/60 border border-dark-border/40 text-dark-muted hover:text-dark-text relative transition-colors"
-              title="الرسائل"
+              title={t('nav.messages')}
             >
               <MessageSquare className="w-4.5 h-4.5" />
             </Link>
@@ -179,8 +181,8 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
             {/* Mobile Logout option indicator */}
             <button
               onClick={onLogout}
-              className="p-1.5 rounded-xl bg-dark-bg/60 border border-dark-border/40 text-red-450 hover:text-red-400 hover:bg-red-500/10 transition-all"
-              title="تسجيل الخروج"
+              className="p-1.5 rounded-xl bg-dark-bg/60 border border-dark-border/40 text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+              title={t('nav.logout')}
             >
               <LogOut className="w-4.5 h-4.5" />
             </button>
@@ -192,9 +194,9 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
         </div>
       </main>
 
-      {/* Mobile Bottom Navigation (Responsive mobile viewport, strictly 5 key navigation icons matching Instagram) */}
+      {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-dark-card/95 backdrop-blur-md border-t border-dark-border py-2 px-1 flex justify-around items-center z-40 select-none">
-        {/* 1. Home (الرئيسية) */}
+        {/* 1. Home */}
         <NavLink
           to="/"
           className={({ isActive }) =>
@@ -204,10 +206,10 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
           }
         >
           <Home className="w-5.5 h-5.5" />
-          <span className="text-[9px] font-bold">الرئيسية</span>
+          <span className="text-[9px] font-bold">{t('nav.home')}</span>
         </NavLink>
 
-        {/* 2. Explore (استكشاف) */}
+        {/* 2. Explore */}
         <NavLink
           to="/explore"
           className={({ isActive }) =>
@@ -217,10 +219,10 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
           }
         >
           <Compass className="w-5.5 h-5.5" />
-          <span className="text-[9px] font-bold">استكشاف</span>
+          <span className="text-[9px] font-bold">{t('nav.explore')}</span>
         </NavLink>
 
-        {/* 3. Create Content (+) (إنشاء) */}
+        {/* 3. Create Content */}
         <NavLink
           to="/create"
           className={({ isActive }) =>
@@ -230,10 +232,10 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
           }
         >
           <PlusSquare className="w-5.5 h-5.5" />
-          <span className="text-[9px] font-bold">نشر</span>
+          <span className="text-[9px] font-bold">{t('nav.create').split(' ')[0]}</span>
         </NavLink>
 
-        {/* 4. Reels (الريلز) */}
+        {/* 4. Reels */}
         <NavLink
           to="/reels"
           className={({ isActive }) =>
@@ -243,10 +245,10 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
           }
         >
           <Film className="w-5.5 h-5.5" />
-          <span className="text-[9px] font-bold">ريلز</span>
+          <span className="text-[9px] font-bold">{t('nav.reels').split(' ')[0]}</span>
         </NavLink>
 
-        {/* 5. Profile with circular avatar image (الملف الشخصي) */}
+        {/* 5. Profile */}
         <NavLink
           to={`/profile/${user?.username || ''}`}
           className={({ isActive }) =>
@@ -264,7 +266,7 @@ export default function Layout({ user, notifications, onLogout, children }: Layo
                   isActive ? 'border-brand-primary scale-105 shadow-md' : 'border-transparent'
                 }`}
               />
-              <span className="text-[9px] font-bold">الملف</span>
+              <span className="text-[9px] font-bold">{t('nav.profile').split(' ')[0]}</span>
             </>
           )}
         </NavLink>

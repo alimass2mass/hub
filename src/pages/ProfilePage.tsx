@@ -188,6 +188,23 @@ export default function ProfilePage({
                     <h2 className="text-lg font-black text-dark-text leading-snug">{profile.fullName}</h2>
                     {profile.isVerified && <CheckCircle2 className="w-4 h-4 text-brand-primary fill-brand-primary/10" />}
                   </div>
+
+                  {/* Professional Status Badge */}
+                  {profile.professionalStatus && profile.professionalStatus !== 'غير محدد' && (
+                    <span className={`inline-flex items-center gap-1.5 text-[9px] font-black px-2.5 py-1 rounded-full border leading-none select-none ${
+                      profile.professionalStatus === 'متاح للعمل' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' :
+                      profile.professionalStatus === 'مشغول في مشروع' ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' :
+                      profile.professionalStatus === 'أبحث عن فرص' ? 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' :
+                      'text-dark-muted bg-dark-border/40 border-dark-border/60'
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        profile.professionalStatus === 'متاح للعمل' ? 'bg-emerald-400 animate-pulse' :
+                        profile.professionalStatus === 'مشغول في مشروع' ? 'bg-yellow-400' :
+                        profile.professionalStatus === 'أبحث عن فرص' ? 'bg-cyan-400 animate-pulse' : 'bg-dark-muted'
+                      }`} />
+                      {profile.professionalStatus}
+                    </span>
+                  )}
                   
                   {/* Block / Unblock Toggle Button next to name */}
                   {!isMe && (
@@ -210,6 +227,20 @@ export default function ProfilePage({
 
                 {/* Bio text block */}
                 {profile.bio && <p className="text-xs text-dark-text mt-3.5 leading-relaxed font-sans">{profile.bio}</p>}
+
+                {/* Skills tags list */}
+                {profile.skills && profile.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-3 justify-center sm:justify-start">
+                    {profile.skills.map((skill, index) => (
+                      <span
+                        key={index}
+                        className="text-[9px] font-bold bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/20 border border-brand-primary/20 px-2.5 py-1 rounded-lg font-mono select-none"
+                      >
+                        #{skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {/* Website and Locations */}
                 <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 text-[10px] text-dark-muted justify-center sm:justify-start font-mono">

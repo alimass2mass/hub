@@ -36,7 +36,6 @@ body {
   color: var(--color-dark-text);
   font-family: var(--font-sans);
   overflow-x: hidden;
-  direction: rtl; /* Set default Arabic RTL environment */
 }
 
 /* Custom fade indicator */

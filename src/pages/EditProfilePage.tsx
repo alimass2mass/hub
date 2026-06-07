@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../types';
 import { MockDB } from '../utils/db';
+import { useLanguage } from '../components/LanguageContext';
 import { 
   Camera, 
   MapPin, 
@@ -50,6 +51,7 @@ const FIELD_OPTIONS = [
 
 export default function EditProfilePage({ currentUser: initialUser, onUpdateProfile }: EditProfilePageProps) {
   const navigate = useNavigate();
+  const { language, setLanguage, t, isRtl } = useLanguage();
   
   // Local profile state synced with current state
   const [currentUser, setCurrentUser] = useState<User | null>(initialUser);
@@ -63,6 +65,8 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
   const [locationValue, setLocationValue] = useState(currentUser?.location || '');
   const [engineeringField, setEngineeringField] = useState(currentUser?.engineeringField || 'هندسة برمجيات');
   const [avatarUrl, setAvatarUrl] = useState(currentUser?.avatarUrl || '');
+  const [professionalStatus, setProfessionalStatus] = useState(currentUser?.professionalStatus || 'متاح للعمل');
+  const [skillsInput, setSkillsInput] = useState(currentUser?.skills?.join(', ') || '');
 
   // Tab 2: Security fields & simulation
   const [currentPassword, setCurrentPassword] = useState('');
@@ -95,6 +99,8 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
       setAvatarUrl(initialUser.avatarUrl || '');
       setIsPrivate(initialUser.isPrivate || false);
       setHideActiveStatus(initialUser.hideActiveStatus || false);
+      setProfessionalStatus(initialUser.professionalStatus || 'متاح للعمل');
+      setSkillsInput(initialUser.skills?.join(', ') || '');
     }
     
     // Fetch all other users
@@ -128,6 +134,11 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
     if (e) e.preventDefault();
     if (!currentUser) return;
 
+    const skills = skillsInput
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
     const updates = {
       fullName,
       bio,
@@ -136,7 +147,9 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
       engineeringField,
       avatarUrl,
       isPrivate,
-      hideActiveStatus
+      hideActiveStatus,
+      professionalStatus,
+      skills
     };
 
     onUpdateProfile(updates);
@@ -256,29 +269,29 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 h-screen overflow-y-auto scrollbar-none text-right font-sans max-w-4xl mx-auto">
+    <div className={`p-4 md:p-6 lg:p-8 h-screen overflow-y-auto scrollbar-none ${isRtl ? 'rtl text-right' : 'ltr text-left'} font-sans max-w-4xl mx-auto`}>
       
       {/* Top Banner with PWA Back Action */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-dark-border/40">
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-dark-border/40`}>
         <div>
-          <span className="text-[9px] bg-brand-primary/10 border border-brand-primary/20 text-brand-primary px-2.5 py-0.5 rounded font-bold uppercase tracking-wider block w-fit mb-1">
-            CONTROL CENTER & SECURITY COCKPIT
+          <span className={`text-[9px] bg-brand-primary/10 border border-brand-primary/20 text-brand-primary px-2.5 py-0.5 rounded font-bold uppercase tracking-wider block w-fit mb-1`}>
+            {t('settings.title_banner')}
           </span>
-          <h1 className="text-xl md:text-2xl font-black text-white">إعدادات الحساب وخصوصية المهندس</h1>
-          <p className="text-xs text-dark-muted mt-1">تحليل أمان الأجهزة، التحقق بخطوتين (2FA)، قوائم الحجب وحماية هجمات الهوية.</p>
+          <h1 className="text-xl md:text-2xl font-black text-white">{t('settings.title')}</h1>
+          <p className="text-xs text-dark-muted mt-1">{t('settings.subtitle')}</p>
         </div>
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-dark-card hover:bg-dark-border border border-dark-border rounded-xl text-dark-muted hover:text-dark-text text-xs transition-colors self-end md:self-center"
+          className={`flex items-center gap-1.5 px-4 py-2 bg-dark-card hover:bg-dark-border border border-dark-border rounded-xl text-dark-muted hover:text-dark-text text-xs transition-colors self-end md:self-center`}
         >
-          <span>رجوع للملف الشخصي</span>
-          <ArrowLeft className="w-4 h-4" />
+          <span>{t('settings.back_btn')}</span>
+          <ArrowLeft className={`w-4 h-4 ${isRtl ? '' : 'rotate-180'}`} />
         </button>
       </div>
 
       {saveSuccess && (
         <div className="p-3 bg-green-500/15 border border-green-500/20 text-green-400 font-bold text-xs rounded-xl mb-4 text-center flex items-center justify-center gap-2 animate-pulse">
-          <span>✓ تم تحديث بياناتك الشخصية وحفظها بشكل آمن ومحمي في ذاكرة التشغيل.</span>
+          <span>{t('settings.success_save')}</span>
         </div>
       )}
 
@@ -293,7 +306,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
           }`}
         >
           <Camera className="w-3.5 h-3.5" />
-          <span>الملف الشخصي والمظهر</span>
+          <span>{t('settings.tab_profile')}</span>
         </button>
 
         <button
@@ -305,7 +318,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
           }`}
         >
           <Shield className="w-3.5 h-3.5" />
-          <span>الأمان ومكافحة الاختراق</span>
+          <span>{t('settings.tab_security')}</span>
           {currentUser?.twoFactorEnabled && (
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping" />
           )}
@@ -320,7 +333,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
           }`}
         >
           <Lock className="w-3.5 h-3.5" />
-          <span>الخصوصية وتعديل الوصول</span>
+          <span>{t('settings.tab_privacy')}</span>
         </button>
       </div>
 
@@ -329,22 +342,22 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
         <form onSubmit={(e) => { e.preventDefault(); handleGeneralSave(); }} className="space-y-5">
           
           {/* Avatar Picture Section */}
-          <div className="bg-dark-card border border-dark-border p-5 rounded-2xl flex flex-col sm:flex-row items-center gap-5">
+          <div className={`bg-dark-card border border-dark-border p-5 rounded-2xl flex flex-col sm:flex-row items-center gap-5`}>
             <img
               src={avatarUrl || 'https://api.dicebear.com/7.x/bottts/svg?seed=user'}
               alt="My Avatar"
               className="w-16 h-16 rounded-2xl object-cover border-2 border-brand-primary shadow-lg"
             />
-            <div className="flex-1 w-full text-center sm:text-right">
-              <label className="text-xs font-bold text-dark-text block mb-1.5">الصورة الشخصية للبروفايل</label>
+            <div className={`flex-1 w-full text-center ${isRtl ? 'sm:text-right' : 'sm:text-left'}`}>
+              <label className="text-xs font-bold text-dark-text block mb-1.5">{t('settings.avatar_label')}</label>
               
               <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center mb-2.5">
                 <input
                   type="url"
-                  placeholder="أدخل رابط صورة مباشر للبروفايل..."
+                  placeholder={t('settings.avatar_placeholder')}
                   value={avatarUrl}
                   onChange={(e) => setAvatarUrl(e.target.value)}
-                  className="flex-1 bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary placeholder:text-dark-muted font-sans"
+                  className={`flex-1 bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary placeholder:text-dark-muted font-sans`}
                 />
                 
                 <div className="relative flex-shrink-0">
@@ -371,38 +384,78 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                     className="flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-primary hover:bg-brand-primary/95 text-white font-extrabold text-xs rounded-xl cursor-pointer transition-all shadow-md shadow-brand-primary/10 select-none"
                   >
                     <Camera className="w-3.5 h-3.5" />
-                    <span>رفع صورة</span>
+                    <span>{t('settings.avatar_upload')}</span>
                   </label>
                 </div>
               </div>
               <span className="text-[10px] text-dark-muted block">
-                الصق رابط صورة مباشرة للمهندس أو اضغط على زر التحميل المباشر لرفع صورة حقيقية من هاتفك أو كومبيوترك.
+                {t('settings.avatar_help')}
               </span>
+            </div>
+          </div>
+
+          {/* Interactive Language Selector directly in the Profile Appearance cockpit */}
+          <div className="bg-dark-card border border-dark-border p-5 rounded-2xl space-y-3.5">
+            <h3 className="text-xs font-black text-white flex items-center gap-1.5 pb-2 border-b border-dark-border/40">
+              <RefreshCw className="w-4 h-4 text-brand-primary animate-spin" style={{ animationDuration: '6s' }} />
+              <span>{t('settings.lang_heading')}</span>
+            </h3>
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-dark-muted block">
+                {t('settings.lang_label')}
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setLanguage('ar')}
+                  className={`py-3 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 border ${
+                    language === 'ar'
+                      ? 'bg-brand-primary/10 border-brand-primary text-brand-primary shadow-sm shadow-brand-primary/5'
+                      : 'bg-dark-bg border-dark-border text-dark-muted hover:text-dark-text'
+                  }`}
+                >
+                  <span>🇸🇦 العربية (Arabic - RTL)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('en')}
+                  className={`py-3 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 border ${
+                    language === 'en'
+                      ? 'bg-brand-primary/10 border-brand-primary text-brand-primary shadow-sm shadow-brand-primary/5'
+                      : 'bg-dark-bg border-dark-border text-dark-muted hover:text-dark-text'
+                  }`}
+                >
+                  <span>🇺🇸 English (English - LTR)</span>
+                </button>
+              </div>
+              <p className="text-[10px] text-dark-muted leading-relaxed">
+                {t('settings.lang_notice')}
+              </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Full Name block */}
             <div className="bg-dark-card border border-dark-border p-5 rounded-2xl space-y-1.5">
-              <label className="text-xs font-bold text-dark-text block">الاسم الكامل واللقب العلمي</label>
+              <label className="text-xs font-bold text-dark-text block">{t('settings.fullname_label')}</label>
               <input
                 type="text"
                 required
-                placeholder="مثال: م. علي سيف الدين"
+                placeholder={isRtl ? "مثال: م. علي سيف الدين" : "e.g. Eng. Ali Saifuddin"}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary text-right"
+                className={`w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary ${isRtl ? 'text-right' : 'text-left'}`}
               />
             </div>
 
             {/* Specialization Selection */}
             <div className="bg-dark-card border border-dark-border p-5 rounded-2xl space-y-1.5">
-              <label className="text-xs font-bold text-dark-text block">التخصص الهندسي الرسمي</label>
+              <label className="text-xs font-bold text-dark-text block">{t('settings.field_label')}</label>
               <div className="relative">
                 <select
                   value={engineeringField}
                   onChange={(e) => setEngineeringField(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary appearance-none cursor-pointer text-right"
+                  className={`w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary appearance-none cursor-pointer ${isRtl ? 'text-right pl-9' : 'text-left pr-9'}`}
                 >
                   {FIELD_OPTIONS.map((opt, idx) => (
                     <option key={idx} value={opt}>
@@ -410,61 +463,94 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                     </option>
                   ))}
                 </select>
-                <Briefcase className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-dark-muted pointer-events-none" />
+                <Briefcase className={`w-4 h-4 absolute ${isRtl ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-dark-muted pointer-events-none`} />
               </div>
             </div>
           </div>
 
+          {/* Professional Status Selection */}
+          <div className="bg-dark-card border border-dark-border p-5 rounded-2xl space-y-1.5">
+            <label className="text-xs font-bold text-dark-text block">{t('settings.status_label')}</label>
+            <div className="relative">
+              <select
+                value={professionalStatus}
+                onChange={(e) => setProfessionalStatus(e.target.value)}
+                className={`w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary appearance-none cursor-pointer ${isRtl ? 'text-right pl-9' : 'text-left pr-9'}`}
+              >
+                <option value="متاح للعمل">{isRtl ? '🟢 متاح للعمل (تلقي فرص جديدة)' : '🟢 Available (Open to opportunities)'}</option>
+                <option value="مشغول في مشروع">{isRtl ? '🟡 مشغول في مشروع (لا أستقبل عروضاً حالية)' : '🟡 Busy in a project (unavailable)'}</option>
+                <option value="أبحث عن فرص">{isRtl ? '🔵 أبحث عن فرص (مهتم بالتعاقد الفوري)' : '🔵 Searching for jobs (Immediate hirable)'}</option>
+                <option value="غير محدد">{isRtl ? '⚪ غير محدد' : '⚪ Unspecified'}</option>
+              </select>
+              <Briefcase className={`w-4 h-4 absolute ${isRtl ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-dark-muted pointer-events-none`} />
+            </div>
+          </div>
+
+          {/* Technical/Programming Skills Input */}
+          <div className="bg-dark-card border border-dark-border p-5 rounded-2xl space-y-1.5">
+            <label className="text-xs font-bold text-dark-text block">{t('settings.skills_label')}</label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={t('settings.skills_placeholder')}
+                value={skillsInput}
+                onChange={(e) => setSkillsInput(e.target.value)}
+                className={`w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary placeholder:text-dark-muted font-sans ${isRtl ? 'text-right' : 'text-left'}`}
+              />
+            </div>
+            <span className="text-[10px] text-dark-muted block mt-1">{t('settings.skills_help')}</span>
+          </div>
+
           {/* Bio block */}
           <div className="bg-dark-card border border-dark-border p-5 rounded-2xl space-y-1.5">
-            <label className="text-xs font-bold text-dark-text block">السيرة المهنية والخبرات (Bio/Slogan)</label>
+            <label className="text-xs font-bold text-dark-text block">{t('settings.bio_label')}</label>
             <textarea
-              placeholder="اكتب نبذة مهنية عن مشاريعك الهندسية السابقة والشركات التي تديرها حالياً..."
+              placeholder={t('settings.bio_placeholder')}
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary text-right resize-none font-sans"
+              className={`w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-xs text-dark-text focus:outline-none focus:border-brand-primary resize-none font-sans ${isRtl ? 'text-right' : 'text-left'}`}
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Website Portfolio section */}
             <div className="bg-dark-card border border-dark-border p-5 rounded-2xl space-y-1.5">
-              <label className="text-xs font-bold text-dark-text block">الموقع الإلكتروني / معرض الأعمال المهنية</label>
+              <label className="text-xs font-bold text-dark-text block">{t('settings.website_label')}</label>
               <div className="relative">
                 <input
                   type="url"
                   placeholder="https://myportfolio.com"
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl py-2.5 pr-9 pl-3 text-xs text-dark-text focus:outline-none focus:border-brand-primary placeholder:text-dark-muted font-sans text-left"
+                  className={`w-full bg-dark-bg border border-dark-border rounded-xl py-2.5 ${isRtl ? 'pr-9 pl-3 text-right' : 'pl-9 pr-3 text-left'} text-xs text-dark-text focus:outline-none focus:border-brand-primary placeholder:text-dark-muted font-sans`}
                 />
-                <Link2 className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-dark-muted" />
+                <Link2 className={`w-4 h-4 absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-dark-muted`} />
               </div>
             </div>
 
             {/* Location block */}
             <div className="bg-dark-card border border-dark-border p-5 rounded-2xl space-y-1.5">
-              <label className="text-xs font-bold text-dark-text block">مكان الإقامة الحالي والعمل</label>
+              <label className="text-xs font-bold text-dark-text block">{t('settings.location_label')}</label>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="مثال: دبي، الإمارات العربية المتحدة"
+                  placeholder={isRtl ? "مثال: دبي، الإمارات العربية المتحدة" : "e.g. Dubai, UAE"}
                   value={locationValue}
                   onChange={(e) => setLocationValue(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl py-2.5 pr-9 pl-3 text-xs text-dark-text focus:outline-none focus:border-brand-primary placeholder:text-dark-muted text-right"
+                  className={`w-full bg-dark-bg border border-dark-border rounded-xl py-2.5 ${isRtl ? 'pr-9 pl-3 text-right' : 'pl-9 pr-3 text-left'} text-xs text-dark-text focus:outline-none focus:border-brand-primary placeholder:text-dark-muted`}
                 />
-                <MapPin className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-dark-muted" />
+                <MapPin className={`w-4 h-4 absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-dark-muted`} />
               </div>
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-brand-primary hover:bg-brand-primary/95 text-white font-extrabold text-xs py-4 rounded-xl shadow-lg shadow-brand-primary/10 transition-all flex items-center justify-center gap-2"
+            className="w-full bg-brand-primary hover:bg-brand-primary/95 text-white font-extrabold text-xs py-4 rounded-xl shadow-lg shadow-brand-primary/10 transition-all flex items-center justify-center gap-2 animate-none"
           >
             <Save className="w-4 h-4" />
-            <span>حفظ البيانات المهنية الأساسية</span>
+            <span>{t('settings.save_btn')}</span>
           </button>
         </form>
       )}
@@ -475,23 +561,23 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
           
           {/* Two-Factor Authentication Management Card */}
           <div className="bg-dark-card border border-dark-border/80 p-5 rounded-2xl relative overflow-hidden">
-            <div className={`absolute top-0 right-0 w-1.5 h-full ${currentUser?.twoFactorEnabled ? 'bg-green-500' : 'bg-yellow-500'}`} />
+            <div className={`absolute top-0 ${isRtl ? 'right-0' : 'left-0'} w-1.5 h-full ${currentUser?.twoFactorEnabled ? 'bg-green-500' : 'bg-yellow-500'}`} />
             
             <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className={`px-2 py-0.5 rounded text-[8px] font-bold ${currentUser?.twoFactorEnabled ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'}`}>
-                    {currentUser?.twoFactorEnabled ? 'نشط وقوي SECURED' : 'حماية متوسطة RECOMMENDED'}
+                    {currentUser?.twoFactorEnabled ? t('settings.sec_2fa_status_active') : t('settings.sec_2fa_status_inactive')}
                   </span>
-                  <h3 className="text-xs font-black text-white">التحقق بخطوتين (Two-Factor Authentication 2FA)</h3>
+                  <h3 className="text-xs font-black text-white">{t('settings.sec_2fa_title')}</h3>
                 </div>
                 <p className="text-[10px] text-dark-muted leading-relaxed max-w-xl">
-                  تعد هذه الميزة أقوى جدار حماية لحسابك المهني. عند تفعيلها، في حال حصل أي شخص غريب على كلمة مرورك، لن يتمكن من فتح الجلسة إلا بعد إدخال كود التحقق الإضافي (كود OTP مرسل للأجهزة المعتمدة لديك).
+                  {t('settings.sec_2fa_desc')}
                 </p>
               </div>
 
               <div className="flex items-center gap-2 self-start sm:self-center">
-                <span className="text-[10px] font-bold text-dark-muted">تفعيل الحماية الثنائية:</span>
+                <span className="text-[10px] font-bold text-dark-muted">{t('settings.sec_2fa_toggle')}</span>
                 <input
                   type="checkbox"
                   checked={currentUser?.twoFactorEnabled || false}
@@ -503,7 +589,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
             {currentUser?.twoFactorEnabled && (
               <div className="mt-3 p-3 bg-dark-bg/60 border border-dark-border rounded-xl">
                 <p className="text-[9px] text-brand-primary font-bold leading-relaxed">
-                  📢 المصادقة الثنائية نشطة الآن! عند محاولة الدخول وتغيير الأجهزة مستقبلاً، سنستعرض لك الرمز السري لمحاكاة التوثيق في واجهة الدخول بشكل آمن.
+                  {t('settings.sec_2fa_active_notice')}
                 </p>
               </div>
             )}
@@ -515,7 +601,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
               <div>
                 <h3 className="text-xs font-bold text-white mb-2.5 flex items-center gap-1.5 pb-2 border-b border-dark-border/40">
                   <Key className="w-3.5 h-3.5 text-brand-primary" />
-                  <span>تعديل كلمة المرور الدورية</span>
+                  <span>{t('settings.sec_pw_title')}</span>
                 </h3>
 
                 {passwordStatus && (
@@ -524,41 +610,41 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                       ? 'bg-green-500/10 border border-green-500/25 text-green-400' 
                       : 'bg-red-500/10 border border-red-500/25 text-red-500'
                   }`}>
-                    {passwordStatus.text}
+                    {passwordStatus.text === 'تم تحديث الرقم السري للحساب بنجاح وتأمينه بتشفير SHA-256!' ? t('settings.sec_pw_success') : (passwordStatus.text === 'يرجى إدخال كلمة المرور الحالية والجديدة' ? t('settings.sec_pw_error_required') : passwordStatus.text)}
                   </div>
                 )}
 
                 <form onSubmit={handleChangePassword} className="space-y-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-dark-muted block">كلمة المرور الحالية</label>
+                    <label className="text-[10px] font-bold text-dark-muted block">{t('settings.sec_pw_current')}</label>
                     <input
                       type="password"
                       placeholder="••••••"
                       required
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-xs text-dark-text focus:outline-none focus:border-brand-primary font-sans text-left"
+                      className={`w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-xs text-dark-text focus:outline-none focus:border-brand-primary font-sans ${isRtl ? 'text-right' : 'text-left'}`}
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-dark-muted block">كلمة المرور الجديدة</label>
+                    <label className="text-[10px] font-bold text-dark-muted block">{t('settings.sec_pw_new')}</label>
                     <input
                       type="password"
-                      placeholder="أدخل كلمة مرور قوية جديدة..."
+                      placeholder={isRtl ? "أدخل كلمة مرور قوية جديدة..." : "Enter a strong new password..."}
                       required
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-xs text-dark-text focus:outline-none focus:border-brand-primary font-sans text-left"
+                      className={`w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-xs text-dark-text focus:outline-none focus:border-brand-primary font-sans ${isRtl ? 'text-right' : 'text-left'}`}
                     />
-                    <span className="text-[9px] text-dark-muted block">تنصح المنظومة باختيار (حروف + أرقام + رموز).</span>
+                    <span className="text-[9px] text-dark-muted block">{t('settings.sec_pw_help')}</span>
                   </div>
 
                   <button
                     type="submit"
                     className="w-full mt-2 py-2.5 bg-dark-bg hover:bg-dark-border text-white border border-dark-border/80 hover:border-brand-primary font-bold text-xs rounded-xl transition-all"
                   >
-                    تحديث كلمة المرور
+                    {t('settings.sec_pw_update_btn')}
                   </button>
                 </form>
               </div>
@@ -570,40 +656,40 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                 <h3 className="text-xs font-bold text-white flex items-center justify-between pb-2 border-b border-dark-border/40">
                   <div className="flex items-center gap-1.5">
                     <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />
-                    <span>مكافحة الهجمات ومعدل الطلبات API</span>
+                    <span>{t('settings.sec_rate_title')}</span>
                   </div>
                   <span className="text-[9px] bg-red-500/10 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded font-bold uppercase">
-                    Rate Limiter active
+                    {t('settings.sec_rate_active')}
                   </span>
                 </h3>
 
-                <div className="p-3 bg-dark-bg/60 border border-dark-border rounded-xl space-y-2 text-right">
+                <div className={`p-3 bg-dark-bg/60 border border-dark-border rounded-xl space-y-2 ${isRtl ? 'text-right' : 'text-left'}`}>
                   <div className="flex justify-between items-center text-[10px]">
-                    <span className="font-bold text-white">الحد الأقصى للمحاولات:</span>
-                    <span className="text-dark-muted font-mono">3 محاولات خاطئة / 30 ثانية</span>
+                    <span className="font-bold text-white">{t('settings.sec_rate_limit')}</span>
+                    <span className="text-dark-muted font-mono">{t('settings.sec_rate_limit_value')}</span>
                   </div>
                   <div className="flex justify-between items-center text-[10px]">
-                    <span className="font-bold text-white">المحاولات الخاطئة المسجلة:</span>
+                    <span className="font-bold text-white">{t('settings.sec_rate_registered')}</span>
                     <span className={`font-black font-mono ${simulatedFailedAttempts > 0 ? 'text-red-400' : 'text-green-400'}`}>
                       {simulatedFailedAttempts} / 3
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-[10px]">
-                    <span className="font-bold text-white">حالة الاتصال ومصادقة الـ IP:</span>
+                    <span className="font-bold text-white">{t('settings.sec_rate_status')}</span>
                     {isSimulatedLocked ? (
                       <span className="text-red-500 font-bold animate-pulse text-[9px] bg-red-500/15 px-2 py-0.5 rounded">
-                        مغلق ومحظور لـ {lockoutCountdown} ثانية 🚫
+                        {t('settings.sec_rate_status_locked').replace('{time}', String(lockoutCountdown))}
                       </span>
                     ) : (
                       <span className="text-green-400 font-bold text-[9px] bg-green-500/15 px-2 py-0.5 rounded">
-                        مؤمن ونشط (Active) ✓
+                        {t('settings.sec_rate_status_active')}
                       </span>
                     )}
                   </div>
                 </div>
 
                 <p className="text-[10px] text-dark-muted leading-relaxed">
-                  يقوم سيرفر الشبكة بصد وحظر عناوين الـ IP التي ترسل كلمات مرور خاطئة تلو الأخرى لمنع تخمين الحسابات بالبرمجيات الخبيثة (Brute-Force Attack Defender).
+                  {t('settings.sec_rate_help')}
                 </p>
               </div>
 
@@ -617,7 +703,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                     : 'bg-brand-primary/10 hover:bg-brand-primary/15 border border-brand-primary/20 text-brand-primary'
                 }`}
               >
-                {isSimulatedLocked ? `انتظر فك الحظر المؤقت (${lockoutCountdown}ث)` : 'محاكاة محاولة تسلل برمجية (Brute-Force Test)'}
+                {isSimulatedLocked ? (isRtl ? `انتظر فك الحظر المؤقت (${lockoutCountdown}ث)` : `Wait system cooling (${lockoutCountdown}s)`) : t('settings.sec_brute_test_btn')}
               </button>
             </div>
           </div>
@@ -628,23 +714,23 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
               <div>
                 <h3 className="text-xs font-black text-white flex items-center gap-1.5">
                   <Smartphone className="w-4 h-4 text-brand-primary" />
-                  <span>نشاط تسجيل الدخول والأجهزة النشطة</span>
+                  <span>{t('settings.sec_sessions_title')}</span>
                 </h3>
-                <p className="text-[10px] text-dark-muted mt-0.5">يعرض جميع المواقع والجلسات التي فتحت حسابك الهندسي مؤخراً.</p>
+                <p className="text-[10px] text-dark-muted mt-0.5">{t('settings.sec_sessions_desc')}</p>
               </div>
               <button
                 type="button"
                 onClick={handleTerminateAllOtherSessions}
                 className="text-[9px] bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white transition-all font-bold px-3 py-1.5 rounded-lg select-none"
               >
-                إنهاء جميع الجلسات النشطة الأخرى
+                {t('settings.sec_sessions_terminate_all')}
               </button>
             </div>
 
             <div className="divide-y divide-dark-border/40 space-y-3">
               {(currentUser?.activeSessions || []).map((session, index) => (
                 <div key={session.id || index} className="flex items-center justify-between pt-3 first:pt-0">
-                  <div className="flex items-start gap-3 text-right">
+                  <div className={`flex items-start gap-3 ${isRtl ? 'text-right' : 'text-left'}`}>
                     <div className="p-2 rounded-xl bg-dark-bg border border-dark-border/80 text-brand-primary mt-0.5">
                       <Smartphone className="w-4 h-4" />
                     </div>
@@ -653,12 +739,12 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                         <span className="text-[11px] font-black text-white">{session.deviceName}</span>
                         {session.isCurrent && (
                           <span className="text-[8px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded font-bold">
-                            الجهاز الحالي
+                            {t('settings.sec_sessions_current')}
                           </span>
                         )}
                       </div>
                       <span className="text-[9px] text-dark-muted block">
-                        📍 {session.location} | عنوان IP: <span className="font-mono font-semibold">{session.ip}</span>
+                        📍 {session.location} | {isRtl ? 'عنوان IP' : 'IP address'}: <span className="font-mono font-semibold">{session.ip}</span>
                       </span>
                     </div>
                   </div>
@@ -669,7 +755,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                       onClick={() => handleTerminateSession(session.id)}
                       className="text-[9px] text-red-400 hover:text-white bg-red-500/10 hover:bg-red-500 border border-red-500/20 px-2.5 py-1.5 rounded-lg transition-all"
                     >
-                      إنهاء الجلسة
+                      {t('settings.sec_sessions_terminate')}
                     </button>
                   )}
                 </div>
@@ -677,7 +763,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
               
               {(currentUser?.activeSessions || []).length === 0 && (
                 <div className="text-center py-4 text-[10px] text-dark-muted">
-                  لا توجد جلسات أخرى مسجلة حالياً.
+                  {t('settings.sec_sessions_none')}
                 </div>
               )}
             </div>
@@ -688,20 +774,20 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
             <div>
               <h3 className="text-xs font-black text-white flex items-center gap-1.5">
                 <Shield className="w-4 h-4 text-brand-primary" />
-                <span>سجل الأمان الشامل ومراقبة التهديدات (Security Audit Trail)</span>
+                <span>{t('settings.sec_logs_title')}</span>
               </h3>
-              <p className="text-[10px] text-dark-muted mt-0.5">يتم تدوين جميع تفاعلات ووصول الحساب والعمليات الأمنية الحساسة لضمان الشفافية ومراقبة التطفل.</p>
+              <p className="text-[10px] text-dark-muted mt-0.5">{t('settings.sec_logs_desc')}</p>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-right text-[10px]">
+              <table className={`w-full ${isRtl ? 'text-right' : 'text-left'} text-[10px]`}>
                 <thead>
                   <tr className="border-b border-dark-border text-dark-muted uppercase font-bold text-[9px]">
-                    <th className="pb-2.5">العملية والحدث الأمني</th>
-                    <th className="pb-2.5 text-center">الجهاز والمصدر</th>
-                    <th className="pb-2.5 text-center">بوابة IP</th>
-                    <th className="pb-2.5 text-center">التوقيت UTC</th>
-                    <th className="pb-2.5 text-left">رمز الحالة</th>
+                    <th className="pb-2.5">{t('settings.sec_logs_action')}</th>
+                    <th className="pb-2.5 text-center">{t('settings.sec_logs_device')}</th>
+                    <th className="pb-2.5 text-center">{t('settings.sec_logs_ip')}</th>
+                    <th className="pb-2.5 text-center">{t('settings.sec_logs_time')}</th>
+                    <th className="pb-2.5 text-center">{t('settings.sec_logs_status')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-dark-border/40">
@@ -711,7 +797,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                       <td className="py-3 text-center text-dark-muted">{log.device}</td>
                       <td className="py-3 text-center font-mono font-semibold text-dark-muted/80">{log.ip}</td>
                       <td className="py-3 text-center text-dark-muted font-mono">{new Date(log.timestamp).toLocaleTimeString()}</td>
-                      <td className="py-3 text-left">
+                      <td className="py-3 text-center">
                         {log.status === 'success' && (
                           <span className="text-[8px] bg-green-500/10 text-green-400 border border-green-500/20 px-2 py-0.5 rounded font-bold uppercase">
                             Success
@@ -733,7 +819,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                   {(currentUser?.securityLogs || []).length === 0 && (
                     <tr>
                       <td colSpan={5} className="text-center py-6 text-dark-muted font-bold text-[10px]">
-                        لم يتم تدوين أي عمليات أمان بعد.
+                        {t('settings.sec_logs_none')}
                       </td>
                     </tr>
                   )}
@@ -754,9 +840,9 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
             
             {/* Private Account switch */}
             <div className="pb-4 flex justify-between items-start gap-4">
-              <div className="text-right">
-                <label className="text-xs font-bold text-white block mb-1">تحديد ظهور الملف الشخصي (حساب خاص)</label>
-                <span className="text-[10px] text-dark-muted">عند تفعيل الميزة، لن يتمكن سوى المهندسين الذين وافقت على متابعتهم من تصفح رييلز ومشاريع وعقود حسابك الشخصي.</span>
+              <div className={isRtl ? 'text-right' : 'text-left'}>
+                <label className="text-xs font-bold text-white block mb-1">{t('settings.priv_account_label')}</label>
+                <span className="text-[10px] text-dark-muted">{t('settings.priv_account_desc')}</span>
               </div>
               <input
                 type="checkbox"
@@ -768,9 +854,9 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
 
             {/* Invisible Status switch */}
             <div className="pt-4 pb-4 flex justify-between items-start gap-4">
-              <div className="text-right">
-                <label className="text-xs font-bold text-white block mb-1">إخفاء نشاط الاتصال والتصفح الخفي (Invisible)</label>
-                <span className="text-[10px] text-dark-muted">يتيح لك التواجد بالمنصة دون تفعيل النقطة الخضراء المتصلة، وتصفح غرف النقاش والقنوات بأمان دون كشف تواجدك للآخرين.</span>
+              <div className={isRtl ? 'text-right' : 'text-left'}>
+                <label className="text-xs font-bold text-white block mb-1">{t('settings.priv_status_label')}</label>
+                <span className="text-[10px] text-dark-muted">{t('settings.priv_status_desc')}</span>
               </div>
               <input
                 type="checkbox"
@@ -782,18 +868,18 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
 
             {/* Message rules selection */}
             <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="text-right">
-                <label className="text-xs font-bold text-white block mb-1">تحديد من يمكنه إرسال الرسائل المباشرة لك في صندوق الوارد</label>
-                <span className="text-[10px] text-dark-muted">حماية حسابك من الإزعاج والرسائل العشوائية والروابط المزيفة.</span>
+              <div className={isRtl ? 'text-right' : 'text-left'}>
+                <label className="text-xs font-bold text-white block mb-1">{t('settings.priv_msg_label')}</label>
+                <span className="text-[10px] text-dark-muted">{t('settings.priv_msg_desc')}</span>
               </div>
               <select
                 value={messageControls}
                 onChange={(e: any) => setMessageControls(e.target.value)}
-                className="bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-xs text-dark-text focus:outline-none focus:border-brand-primary cursor-pointer text-right min-w-[150px]"
+                className={`bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-xs text-dark-text focus:outline-none focus:border-brand-primary cursor-pointer ${isRtl ? 'text-right' : 'text-left'} min-w-[150px]`}
               >
-                <option value="all">الجميع (أقصى مرونة)</option>
-                <option value="followers">المتابعين الذين أتابعهم فقط</option>
-                <option value="none">لا أحد (إلغاء صندوق الوارد)</option>
+                <option value="all">{t('settings.priv_msg_all')}</option>
+                <option value="followers">{t('settings.priv_msg_followers')}</option>
+                <option value="none">{t('settings.priv_msg_none')}</option>
               </select>
             </div>
           </div>
@@ -803,9 +889,9 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
             <div>
               <h3 className="text-xs font-black text-white flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-brand-primary" />
-                <span>إدارة المستخدمين وحماية الخصوصية الشخصية</span>
+                <span>{t('settings.priv_users_panel_title')}</span>
               </h3>
-              <p className="text-[10px] text-dark-muted mt-0.5">تحكم بخصوصية مجتمعك. يمكنك حظر أو كتم منشورات أو تقييد حسابات زملائك في المنصة للحد من وصولهم إليك.</p>
+              <p className="text-[10px] text-dark-muted mt-0.5">{t('settings.priv_users_panel_desc')}</p>
             </div>
 
             <div className="divide-y divide-dark-border/40 space-y-3.5">
@@ -816,7 +902,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
 
                 return (
                   <div key={user.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3.5 first:pt-0">
-                    <div className="flex items-center gap-2.5 text-right">
+                    <div className={`flex items-center gap-2.5 ${isRtl ? 'text-right' : 'text-left'}`}>
                       <img
                         src={user.avatarUrl || 'https://api.dicebear.com/7.x/bottts/svg?seed=user'}
                         alt={user.fullName}
@@ -833,17 +919,17 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                         <div className="flex gap-1.5 mt-1">
                           {isBlocked && (
                             <span className="text-[8px] bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded font-bold border border-red-500/15">
-                              محظور
+                              {t('settings.priv_status_blocked')}
                             </span>
                           )}
                           {isMuted && (
                             <span className="text-[8px] bg-yellow-500/10 text-yellow-400 px-1.5 py-0.5 rounded font-bold border border-yellow-500/15">
-                              مكتوم
+                              {t('settings.priv_status_muted')}
                             </span>
                           )}
                           {isRestricted && (
                             <span className="text-[8px] bg-purple-500/10 text-purple-400 px-1.5 py-0.5 rounded font-bold border border-purple-500/15">
-                              مقيد
+                              {t('settings.priv_status_restricted')}
                             </span>
                           )}
                         </div>
@@ -861,7 +947,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                             : 'bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300'
                         }`}
                       >
-                        {isBlocked ? 'إلغاء الحظر' : 'حظر (Block)'}
+                        {isBlocked ? t('settings.priv_action_unblock') : t('settings.priv_action_block')}
                       </button>
 
                       <button
@@ -873,7 +959,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                             : 'bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 hover:text-yellow-300'
                         }`}
                       >
-                        {isMuted ? 'إلغاء الكتم' : 'كتم (Mute)'}
+                        {isMuted ? t('settings.priv_action_unmute') : t('settings.priv_action_mute')}
                       </button>
 
                       <button
@@ -885,7 +971,7 @@ export default function EditProfilePage({ currentUser: initialUser, onUpdateProf
                             : 'bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 hover:text-purple-300'
                         }`}
                       >
-                        {isRestricted ? 'إلغاء التقييد' : 'تقييد الحساب'}
+                        {isRestricted ? t('settings.priv_action_unrestrict') : t('settings.priv_action_restrict')}
                       </button>
                     </div>
                   </div>

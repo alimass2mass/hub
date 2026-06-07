@@ -23,6 +23,7 @@ export interface User {
   password_hash?: string;
   twoFactorSecret?: string;
   professionalStatus?: string; // e.g. "متاح للعمل", "مشغول في مشروع", "أبحث عن فرص"
+  skills?: string[]; // e.g. ["React", "AutoCAD", "BIM"]
 }
 
 export interface UserSession {
